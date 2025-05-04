@@ -1,33 +1,50 @@
 
 # views.py
-from rest_framework import viewsets, permissions
-from django.contrib.auth.models import User
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
 from .models import Goal, GoalCheckIn,ReminderSettings
 from .serializers import (
-    UserSerializer, GoalSerializer,
+     GoalSerializer,
     GoalProgressSerializer, AnalyticsSerializer, ReminderSettingsSerializer
 )
 from datetime import timezone
+from .serializers import (RegisterationSerializer,LoginSerializer)
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
-    http_method_names = ['post']
 
-class CustomAuthToken(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                         context={'request': request})
+
+
+
+class RegisterationViewSet(viewsets.ModelViewSet):
+    serializer_class = RegisterationSerializer
+    permission_classes = (AllowAny,)
+    http_method_names = ('post')
+    
+    def create(self, request, *args, **kwargs):
+        serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key})
+        result =serializer.save()
+        return Response(
+        result
+        , status=status.HTTP_201_CREATED)
+        
+class LoginViewSet(viewsets.ModelViewSet):
+    serializer_class = LoginSerializer
+    permission_classes = (AllowAny,)
+    http_method_names = ('post')
+    
+    def create(self, request, *args, **kwargs):
+        serializer=self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
 
 class GoalViewSet(viewsets.ModelViewSet):
     serializer_class = GoalSerializer

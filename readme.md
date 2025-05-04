@@ -21,7 +21,14 @@ Create a new user account.
     "password": "strongpassword"
 }
 ```
-
+**Response:**
+```json
+{
+  "username": "john",
+  "email": "john@example.com",
+  "token": "d65b24fe38a0456a8c..."
+}
+```
 
 
 ## POST `/api/login/`
@@ -33,7 +40,12 @@ Get authentication token.
     "password": "strongpassword"
 }
 ```
-
+**Response:**
+```json
+{
+  "token": "d65b24fe38a0456a8c..."
+}
+```
 
 
 ## POST `/api/goals/`
