@@ -13,6 +13,41 @@ The Micro Goals Tracker API is a RESTful API designed to help users set, track, 
 
 -**Reminders:** Set daily reminders for goals to stay on track.
 
+
+## Installation
+
+Clone the repository:
+
+```bash
+git https://github.com/Just-Mike4/micro-goals-tracker.git
+cd micro-goals-tracker
+```
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Apply the database migrations:
+
+```bash
+python manage.py migrate
+```
+
+Run the development server:
+
+```bash
+python manage.py runserver
+```
+
 ## API Endpoints Documentation
 
 ## POST `/api/register/`
