@@ -171,3 +171,12 @@ Set daily reminder preferences for a goal.
 
 ## GET `/api/reminders/`
 List all reminders and times.  
+
+## PATCH `/api/reminders/{id}`
+**Request Body:**
+```json
+{
+    "reminder_time": "20:00",
+    "enabled": true
+}
+```

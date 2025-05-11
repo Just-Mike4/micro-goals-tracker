@@ -1,6 +1,6 @@
 
 # views.py
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status,serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Goal, GoalCheckIn,ReminderSettings
@@ -8,7 +8,7 @@ from .serializers import (
      GoalSerializer,
     GoalProgressSerializer, AnalyticsSerializer, ReminderSettingsSerializer
 )
-from datetime import timezone
+from django.utils import timezone
 from .serializers import (RegisterationSerializer,LoginSerializer)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -98,6 +98,17 @@ class AnalyticsViewSet(viewsets.ViewSet):
             completed=True
         ).count()
 
+        # Calculate the most consistent goal in Python
+        most_consistent_goal = max(
+            goals, 
+            key=lambda goal: goal.current_streak, 
+            default=None
+        )
+        most_consistent_goal_data = {
+            'title': most_consistent_goal.title,
+            'current_streak': most_consistent_goal.current_streak
+        } if most_consistent_goal else None
+
         analytics = {
             'total_goals': goals.count(),
             'active_goals': goals.count(),
@@ -105,8 +116,7 @@ class AnalyticsViewSet(viewsets.ViewSet):
             'longest_streak_overall': max(
                 [goal.longest_streak for goal in goals], default=0
             ),
-            'most_consistent_goal': goals.order_by('-current_streak')
-                .values('title', 'current_streak').first()
+            'most_consistent_goal': most_consistent_goal_data
         }
         serializer = AnalyticsSerializer(analytics)
         return Response(serializer.data)
@@ -114,10 +124,27 @@ class AnalyticsViewSet(viewsets.ViewSet):
 class ReminderViewSet(viewsets.ModelViewSet):
     serializer_class = ReminderSettingsSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names=['get','post','patch','delete']
 
     def get_queryset(self):
         return ReminderSettings.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        goal_id = self.request.data.get('goal')
+        if not goal_id:
+            raise serializers.ValidationError({"goal": "This field is required."})
+
+        # Check if a reminder already exists for the goal
+        if ReminderSettings.objects.filter(goal_id=goal_id).exists():
+            raise serializers.ValidationError({"goal": "A reminder already exists for this goal."})
+
+        goal = Goal.objects.filter(id=goal_id, user=self.request.user).first()
+        if not goal:
+            raise serializers.ValidationError({"goal": "Invalid goal or you do not have permission to set a reminder for this goal."})
+
+        serializer.save(user=self.request.user, goal=goal)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True  # Indicate that this is a partial update
+        return super().partial_update(request, *args, **kwargs)
 

@@ -79,7 +79,7 @@ class GoalCheckInSerializer(serializers.ModelSerializer):
 class GoalSerializer(serializers.ModelSerializer):
     streak = serializers.SerializerMethodField()
     last_checkin = serializers.SerializerMethodField()
-    
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     class Meta:
         model = Goal
         fields = [
@@ -112,10 +112,11 @@ class GoalProgressSerializer(serializers.ModelSerializer):
         ]
 
 class ReminderSettingsSerializer(serializers.ModelSerializer):
+    goal = serializers.PrimaryKeyRelatedField(queryset=Goal.objects.all())
+
     class Meta:
         model = ReminderSettings
         fields = ['goal', 'time', 'enabled']
-        extra_kwargs = {'goal': {'read_only': True}}
 
 class AnalyticsSerializer(serializers.Serializer):
     total_goals = serializers.IntegerField()
