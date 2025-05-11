@@ -3,11 +3,15 @@
 The Micro Goals Tracker API is a RESTful API designed to help users set, track, and manage their personal goals effectively. It provides endpoints for user authentication, goal creation, progress tracking, and analytics. Users can also set reminders and view detailed statistics about their habits and achievements.
 
 ## Features:
-**User Management:** Register and log in to access personalized goal tracking.
-**Goal Management:** Create, edit, delete, and view goals.
-**Progress Tracking:** Mark goals as completed, view streaks, and analyze progress over time.
-**Analytics:** Get insights into habits, including streaks and consistency.
-**Reminders:** Set daily reminders for goals to stay on track.
+-**User Management:** Register and log in to access personalized goal tracking.
+
+-**Goal Management:** Create, edit, delete, and view goals.
+
+-**Progress Tracking:** Mark goals as completed, view streaks, and analyze progress over time.
+
+-**Analytics:** Get insights into habits, including streaks and consistency.
+
+-**Reminders:** Set daily reminders for goals to stay on track.
 
 ## API Endpoints Documentation
 
