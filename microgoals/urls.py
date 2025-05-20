@@ -22,7 +22,9 @@ from goals.views import (
     LoginViewSet,
     GoalViewSet,
     AnalyticsViewSet,
-    ReminderViewSet
+    ReminderViewSet,
+    PasswordResetConfirmView,
+    PasswordResetView
 )
 
 router = DefaultRouter()
@@ -35,6 +37,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/analytics/', AnalyticsViewSet.as_view({'get': 'list'})),
     path('api/', include(router.urls)),
+    path('api/password-reset/', PasswordResetView.as_view(), name='password-reset'),
+    path('api/password-reset-confirm/<uid>/<token>/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]
 
 
